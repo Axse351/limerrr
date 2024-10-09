@@ -1,4 +1,4 @@
-@extends('staff.layouts.app')
+@extends('admin.layouts.app')
 
 @section('title', 'Scan QR Code')
 
@@ -13,16 +13,16 @@
     </style>
 @endpush
 
-@section('staff.content')
+@section('admin.content')
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Scan QR Code</h1>
+                <h1>Scan QR Code Admin</h1>
             </div>
             <div class="section-body">
                 <div class="row">
                     <div class="col-12">
-                        @include('staff.layouts.alert')
+                        @include('admin.layouts.alert')
                     </div>
                 </div>
 
@@ -35,13 +35,12 @@
                             <div class="card-body">
                                 <div id="qr-reader"></div> <!-- Responsive QR reader -->
                                 <button id="start-scan-btn" class="btn btn-primary mb-3">Start Scan</button>
-                                <form id="scanForm" action="{{ route('scan.process') }}" method="POST">
+                                <form id="scanForm" action="{{ route('scann.process') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="qrcode" id="qrcodeInput">
                                 </form>
                                 <!-- Add audio element for scan success sound -->
                                 <audio id="scanSuccessSound" src="{{ asset('sounds/scan-success.mp3') }}"></audio>
-                                <h5 class="mt-4">Jumlah wahana tersisa: {{ $transaksi->remaining_wahana ?? 'Tidak tersedia' }}</h5>
                             </div>
                         </div>
                     </div>

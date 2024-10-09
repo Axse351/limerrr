@@ -17,6 +17,9 @@ class Transaksi extends Model
         'nm_konsumen',
         'nohp',
         'paket_id',
+        'wahana',
+        'porsi',
+        'barcode',
     ];
 
     /**
@@ -27,5 +30,9 @@ class Transaksi extends Model
     public function paket()
     {
         return $this->belongsTo(Paket::class, 'paket_id');
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'created_by'); // atau 'user_id' tergantung kolomnya
     }
 }

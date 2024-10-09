@@ -16,6 +16,11 @@ class PaketController extends Controller
          $pakets = Paket::paginate(10);
          return view('staff.pages.paket.index', compact('pakets'));
      }
+     public function index_admin()
+     {
+         $pakets = Paket::paginate(10);
+         return view('admin.pages.paket.index', compact('pakets'));
+     }
 // PaketController.php
 public function getPaket($id)
 {
@@ -61,6 +66,11 @@ public function getPaket($id)
     {
         $paket = Paket::findOrFail($id);
         return view('staff.paket.show', compact('paket'));
+    }
+    public function showadmin($id)
+    {
+        $paket = Paket::findOrFail($id);
+        return view('admin.paket.show', compact('paket'));
     }
 
     // Method untuk menampilkan form edit paket

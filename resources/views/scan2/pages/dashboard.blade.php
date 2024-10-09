@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('scan2.layouts.app')
 
 @section('title', 'General Dashboard')
 
@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="{{ asset('library/summernote/dist/summernote-bs4.min.css') }}">
 @endpush
 
-@section('admin.content')
+@section('scan2.content')
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>LIMERR RESORT ADMIN</h1>
+                <h1>DP</h1>
             </div>
             <div class="row">
                 <div class="col-lg-3 col-md-6 col-sm-6 col-12">

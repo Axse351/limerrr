@@ -18,35 +18,31 @@ class AuthController extends Controller
     {
         $messages = [
             'name.required' => 'Nama tidak boleh kosong',
-            'email.unique' => 'email sudah dimiliki, silahkan login!',
+            'email.required' => 'Email tidak boleh kosong',
+            'email.unique' => 'Email sudah dimiliki, silahkan login!',
             'password.required' => 'Password tidak boleh kosong',
             'password.min' => 'Password minimal 8 karakter',
             'password.max' => 'Password maksimal 16 karakter',
         ];
 
         $request->validate([
-            'email' => 'required|integer|unique:users',
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
             'password' => 'required|min:8|max:16',
-        ], $messages);
+            'role' => 'in:admin,staff,scan1,scan2', // Validasi role
+        ], $messages);  
 
+        // Default role is 'staff' if not provided
+        $role = $request->role ?? 'staff';
 
-        if ($request->email != null) {
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'role' => 'staff',
-            ]);
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $role,
+        ]);
 
-            return redirect('/login');
-        } else {
-            $user = User::create([
-                'name' => $request->name,
-                'password' => Hash::make($request->password),
-            ]);
-
-            return redirect('/login');
-        }
+        return redirect('/login')->with('success', 'Pendaftaran berhasil, silahkan login!');
     }
 
     public function login()
@@ -57,32 +53,31 @@ class AuthController extends Controller
     public function loginStore(Request $request)
     {
         $messages = [
-            'email.required' => 'email tidak boleh kosong',
+            'email.required' => 'Email tidak boleh kosong',
             'password.required' => 'Password tidak boleh kosong',
         ];
 
         $request->validate([
-            'email' => 'required',
+            'email' => 'required|email',
             'password' => 'required',
         ], $messages);
 
         $credentials = $request->only('email', 'password');
 
-        // $credentials = [
-        //     'name' => $request->name,
-        //     'password' => $request->password,
-        // ];
-
         if (Auth::attempt($credentials)) {
             // $request->session()->regenerate();
             // return redirect('/rektorat/dashboard');
-
+        
             if (Auth::user()->role == 'admin') {
                 return redirect('admin/dashboard');
             } elseif (Auth::user()->role == 'staff') {
                 return redirect('staff/dashboard');
+            } elseif (Auth::user()->role == 'scan1') {
+                return redirect('scan1/dashboard'); // Sesuaikan URL ini dengan rute yang Anda inginkan
+            } elseif (Auth::user()->role == 'scan2') {
+                return redirect('scan2/dashboard'); // Sesuaikan URL ini dengan rute yang Anda inginkan
             }
-        } else {
+        }else {
             return back()->withInput();
         }
     }

@@ -8,6 +8,7 @@ use App\Models\Paket;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Twilio\Rest\Client;
 
 class TransaksiController extends Controller
 {
@@ -15,6 +16,12 @@ class TransaksiController extends Controller
     {
         $transaksis = Transaksi::paginate(20); // Atur jumlah item per halaman
         return view('staff.pages.transaksi.index', compact('transaksis'));
+    }
+    public function index_admin()
+    {
+       $transaksis = Transaksi::with('user')->paginate(20); 
+
+       return view('admin.pages.transaksi.index', compact('transaksis'));
     }
 
     public function create()
@@ -25,49 +32,43 @@ class TransaksiController extends Controller
         // Kirim data paket ke view
         return view('staff.pages.transaksi.create', compact('pakets'));
     }
+    public function createadmin()
+    {
+        // Get all paket data for admin
+        $pakets = Paket::all();
+
+        // Send paket data to the view
+        return view('admin.pages.transaksi.create', compact('pakets'));
+    }
 
     public function store(Request $request)
-    {
-        $validatedData = $request->validate([
-            'nm_konsumen' => 'required|string|max:255',
-            'nohp' => 'required|digits_between:10,13',
-            'paket_id' => 'required|exists:pakets,id',
-            'wahana' => 'required',
-            'porsi' => 'required',
-        ]);
+{
+    $request->validate([
+        'nm_konsumen' => 'required|string|max:255',
+        'nohp' => 'required|string|max:15',
+        'paket_id' => 'required|integer',
+        'wahana' => 'required|string|max:255',
+        'porsi' => 'required|integer',
+        'barcode' => 'required|string|max:255',
+    ]);
 
-        try {
-            // Simpan transaksi
-            $transaksi = Transaksi::create($validatedData);
+    // Simpan transaksi ke dalam database
+    $transaksi = Transaksi::create([
+        'nm_konsumen' => $request->nm_konsumen,
+        'nohp' => $request->nohp,
+        'paket_id' => $request->paket_id,
+        'wahana' => $request->wahana,
+        'porsi' => $request->porsi,
+        'barcode' => $request->barcode,
+    ]);
 
-            // Generate QR code untuk transaksi
-            $qrCode = QrCode::format('png')
-                ->size(200)
-                ->generate('Transaksi ID: ' . $transaksi->id . ', Konsumen: ' . $transaksi->nm_konsumen);
+    // Redirect ke halaman index transaksi setelah sukses
+    return redirect()->route('staff.transaksi.index')->with('success', 'Transaksi berhasil disimpan.');
+}
 
-            // Simpan QR Code sebagai gambar di folder public storage
-            $fileName = 'qrcodes/' . $transaksi->id . '.png';
-            Storage::disk('public')->put($fileName, $qrCode);
-
-            // URL publik dari QR Code
-            $qrCodeUrl = asset('storage/' . $fileName);
-
-            return response()->json([
-                'success' => true,
-                'qrCodeUrl' => $qrCodeUrl,
-                'message' => 'Transaksi berhasil disimpan dan QR code telah di-generate.'
-            ]);
-
-        } catch (\Exception $e) {
-            // Log error untuk debugging
-            Log::error('Gagal menyimpan transaksi: ' . $e->getMessage());
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal menyimpan transaksi. Silakan coba lagi.'
-            ]);
-        }
-    }
+    
+    
+    
 
     public function getPaket($id)
     {

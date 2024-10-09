@@ -3,14 +3,6 @@
 @section('title', 'Scan QR Code')
 
 @push('style')
-    <!-- Add custom styles if needed -->
-    <style>
-        #qr-reader {
-            width: 100%; /* Full width for responsive design */
-            height: auto; /* Auto height */
-            display: none; /* Initially hidden */
-        }
-    </style>
 @endpush
 
 @section('staff.content')
@@ -33,15 +25,12 @@
                                 <h4>Scan QR Code</h4>
                             </div>
                             <div class="card-body">
-                                <div id="qr-reader"></div> <!-- Responsive QR reader -->
+                                <div id="qr-reader" style="width: 500px; display:none;"></div>
                                 <button id="start-scan-btn" class="btn btn-primary mb-3">Start Scan</button>
-                                <form id="scanForm" action="{{ route('scan.process') }}" method="POST">
+                                <form id="scanForm" action="{{ route('transaksi.scan') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="qrcode" id="qrcodeInput">
                                 </form>
-                                <!-- Add audio element for scan success sound -->
-                                <audio id="scanSuccessSound" src="{{ asset('sounds/scan-success.mp3') }}"></audio>
-                                <h5 class="mt-4">Jumlah wahana tersisa: {{ $transaksi->remaining_wahana ?? 'Tidak tersedia' }}</h5>
                             </div>
                         </div>
                     </div>
@@ -52,19 +41,11 @@
 @endsection
 
 @push('scripts')
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js" type="text/javascript"></script>
 <script>
-    // Play sound on successful scan
-    function playScanSuccessSound() {
-        const audio = document.getElementById('scanSuccessSound');
-        audio.currentTime = 0; // Reset to the start of the sound
-        audio.play(); // Play the sound
-    }
-
     function onScanSuccess(decodedText, decodedResult) {
         console.log(`Code matched = ${decodedText}`, decodedResult);
         document.getElementById('qrcodeInput').value = decodedText;
-        playScanSuccessSound(); // Play sound on successful scan
         document.getElementById('scanForm').submit();
     }
 
@@ -73,11 +54,8 @@
     }
 
     document.getElementById('start-scan-btn').addEventListener('click', function() {
-        document.getElementById('qr-reader').style.display = 'block'; // Show the QR reader
-        const html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { 
-            fps: 10, 
-            qrbox: 250 
-        });
+        document.getElementById('qr-reader').style.display = 'block';
+        const html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: 250 });
         html5QrcodeScanner.render(onScanSuccess, onScanFailure);
     });
 </script>
