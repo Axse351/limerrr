@@ -39,7 +39,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $role,
+            'role' => $request->role, // Pastikan role diambil dari input
         ]);
 
         return redirect('/login')->with('success', 'Pendaftaran berhasil, silahkan login!');
@@ -49,38 +49,27 @@ class AuthController extends Controller
     {
         return view('auth.pages.login');
     }
+public function loginStore(Request $request)
+{
+    $credentials = $request->only('email', 'password');
 
-    public function loginStore(Request $request)
-    {
-        $messages = [
-            'email.required' => 'Email tidak boleh kosong',
-            'password.required' => 'Password tidak boleh kosong',
-        ];
-
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ], $messages);
-
-        $credentials = $request->only('email', 'password');
-
-        if (Auth::attempt($credentials)) {
-            // $request->session()->regenerate();
-            // return redirect('/rektorat/dashboard');
+    if (Auth::attempt($credentials)) {
+        $user = Auth::user();
         
-            if (Auth::user()->role == 'admin') {
-                return redirect('admin/dashboard');
-            } elseif (Auth::user()->role == 'staff') {
-                return redirect('staff/dashboard');
-            } elseif (Auth::user()->role == 'scan1') {
-                return redirect('scan1/dashboard'); // Sesuaikan URL ini dengan rute yang Anda inginkan
-            } elseif (Auth::user()->role == 'scan2') {
-                return redirect('scan2/dashboard'); // Sesuaikan URL ini dengan rute yang Anda inginkan
-            }
-        }else {
-            return back()->withInput();
+        // Redirect based on role
+        if ($user->role == 'admin') {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->role == 'staff') {
+            return redirect()->route('staff.dashboard');
+        } elseif ($user->role == 'scan1') {
+            return redirect()->route('scan1.dashboard');
+        } elseif ($user->role == 'scan2') {
+            return redirect()->route('scan2.dashboard');
         }
+    } else {
+        return back()->withInput()->with('error', 'Login gagal, silakan coba lagi.');
     }
+}
 
     public function logout()
     {

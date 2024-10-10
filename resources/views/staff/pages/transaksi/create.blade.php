@@ -127,6 +127,7 @@
 
 @push('scripts')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="path/to/jquery.nicescroll.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     
@@ -289,12 +290,12 @@
         });
             // Jika validasi berhasil, tampilkan modal
             if (isValid) {
-            var nm_konsumen = $('input[name="nm_konsumen"]').val();
-            var nohp = $('input[name="nohp"]').val();
-            var nm_paket = $('#nm_paket option:selected').text();
-            var wahana = $('#wahana').val();
-            var porsi = $('#porsi').val();
-            var barcode = $('input[name="barcode"]').val();  // Tangkap nilai barcode
+            var nm_konsumen = $('input[name="nm_konsumen"]').val(); // Nama konsumen
+            var nohp = $('input[name="nohp"]').val(); // Nomor handphone
+            var nm_paket = $('#nm_paket option:selected').text(); // Nama paket
+            var wahana = $('#wahana').val(); // Wahana
+            var porsi = $('#porsi').val(); // Porsi
+            var barcode = $('input[name="barcode"]').val(); // Barcode
 
             $('#confirm_nm_konsumen').text(nm_konsumen);
             $('#confirm_nohp').text(nohp);
@@ -311,34 +312,34 @@
 
         // Submit form setelah konfirmasi
         $('#confirmSubmit').click(function() {
-        var formData = $('#transaksiForm').serialize(); // Mengambil data form
+    var formData = $('#transaksiForm').serialize(); // Mengambil data form
 
-        $.ajax({
-            url: $('#transaksiForm').attr('action'),
-            method: 'POST',
-            data: formData,
-            success: function(response) {
-                if (response.success) {
-                    var nohp = $('input[name="nohp"]').val().replace(/^0/, '62');
-                    var message = `Halo, saya ingin melakukan transaksi dengan detail berikut:\n\nNama Konsumen: ${$('input[name="nm_konsumen"]').val()}\nPaket: ${$('#nm_paket option:selected').text()}\nWahana: ${$('#wahana').val()}\nPorsi: ${$('#porsi').val()}`;
-                    var encodedMessage = encodeURIComponent(message); // Encode pesan agar URL tidak rusak
-                    var whatsappUrl = `https://wa.me/${nohp}?text=${encodedMessage}`;
-                    
-                    window.open(whatsappUrl, '_blank');
-                    window.open(response.whatsappUrl, '_blank');
-                    
-                    setTimeout(function() {
-                        window.location.href = "{{ route('staff.transaksi.index') }}";
-                    }, 3000); // Waktu tunggu sebelum redirect (3 detik)
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function(xhr) {
-                console.log(xhr.responseText);
+    $.ajax({
+        url: $('#transaksiForm').attr('action'),
+        method: 'POST',
+        data: formData,
+        success: function(response) {
+            if (response.success) {
+                var nohp = $('input[name="nohp"]').val().replace(/^0/, '62');
+                var message = `Halo, saya ingin melakukan transaksi dengan detail berikut:\n\nNama Konsumen: ${$('input[name="nm_konsumen"]').val()}\nPaket: ${$('#nm_paket option:selected').text()}\nWahana: ${$('#wahana').val()}\nPorsi: ${$('#porsi').val()}`;
+                var encodedMessage = encodeURIComponent(message); // Encode pesan agar URL tidak rusak
+                var whatsappUrl = `https://wa.me/${nohp}?text=${encodedMessage}`;
+                
+                window.open(whatsappUrl, '_blank'); // Kirim pesan ke WA
+                
+                // Redirect ke halaman index setelah submit berhasil
+                setTimeout(function() {
+                    window.location.href = "{{ route('staff.transaksi.index') }}";
+                }, 3000); 
+            } else {
+                alert(response.message);
             }
-        });
+        },
+        error: function(xhr) {
+            console.log(xhr.responseText);
+        }
     });
+});
 });
 
 </script>

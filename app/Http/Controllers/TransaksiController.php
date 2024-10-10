@@ -42,29 +42,27 @@ class TransaksiController extends Controller
     }
 
     public function store(Request $request)
-{
-    $request->validate([
-        'nm_konsumen' => 'required|string|max:255',
-        'nohp' => 'required|string|max:15',
-        'paket_id' => 'required|integer',
-        'wahana' => 'required|string|max:255',
-        'porsi' => 'required|integer',
-        'barcode' => 'required|string|max:255',
-    ]);
-
-    // Simpan transaksi ke dalam database
-    $transaksi = Transaksi::create([
-        'nm_konsumen' => $request->nm_konsumen,
-        'nohp' => $request->nohp,
-        'paket_id' => $request->paket_id,
-        'wahana' => $request->wahana,
-        'porsi' => $request->porsi,
-        'barcode' => $request->barcode,
-    ]);
-
-    // Redirect ke halaman index transaksi setelah sukses
-    return redirect()->route('staff.transaksi.index')->with('success', 'Transaksi berhasil disimpan.');
-}
+    {
+        $request->validate([
+            'nm_konsumen' => 'required|string|max:255',
+            'nohp' => 'required|string|max:15',
+            'paket_id' => 'required|integer',
+            'barcode' => 'required|string|max:255',
+        ]);
+    
+        // Simpan transaksi ke dalam database
+        $transaksi = Transaksi::create([
+            'nm_konsumen' => $request->nm_konsumen,
+            'nohp' => $request->nohp,
+            'paket_id' => $request->paket_id,
+            'barcode' => $request->barcode,
+        ]);
+    
+        // Redirect ke halaman index transaksi setelah sukses
+        return redirect()->route('staff.transaksi.index')->with('success', 'Transaksi berhasil disimpan.');
+    }
+    
+    
 
     
     

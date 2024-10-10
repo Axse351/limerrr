@@ -51,8 +51,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('admin')->middleware('roleAs:admin')->group(function () {
         Route::get('/dashboard', function () {
             return view('admin.pages.dashboard');
-        })->name('admin.dashboard');
-
+        })->name('admin.dashboard');  
 
         Route::get('transaksi', [TransaksiController::class, 'index_admin'])->name('admin.transaksi.index');
         Route::put('transaksi/{transaksi}', [TransaksiController::class, 'update_admin'])->name('admin.transaksi.update');
