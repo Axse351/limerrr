@@ -1,6 +1,6 @@
 @extends('staff.layouts.app')
 
-@section('title', 'Riwayat')
+@section('title', 'Riwayat Transaksi')
 
 @push('style')
     <!-- CSS Libraries -->
@@ -11,11 +11,11 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Riwayat Barang</h1>
+                <h1>Riwayat Transaksi</h1>
                 <div class="section-header-breadcrumb">
                     <div class="breadcrumb-item active"><a href="#">Dashboard</a></div>
                     <div class="breadcrumb-item"><a href="#">Riwayat</a></div>
-                    <div class="breadcrumb-item">Riwayat</div>
+                    <div class="breadcrumb-item">Riwayat Transaksi</div>
                 </div>
             </div>
             <div class="section-body">
@@ -25,23 +25,22 @@
                     </div>
                 </div>
 
-
                 <div class="row mt-4">
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4>Riwayat Barang Masuk</h4>
+                                <h4>Riwayat Transaksi</h4>
                             </div>
                             <div class="card-body">
 
-                                <div class="float-ledt">
+                                {{-- <div class="float-left">
                                     <a href="{{ route('staff.history.create') }}" class="btn btn-primary">Tambah Riwayat</a>
-                                </div>
+                                </div> --}}
 
                                 <div class="float-right">
                                     <form method="GET" action="{{ route('history.index') }}">
                                         <div class="input-group">
-                                            <input type="text" class="form-control" placeholder="Search" name="name">
+                                            <input type="text" class="form-control" placeholder="Cari transaksi" name="search">
                                             <div class="input-group-append">
                                                 <button class="btn btn-primary"><i class="fas fa-search"></i></button>
                                             </div>
@@ -54,56 +53,44 @@
                                 <div class="table-responsive">
                                     <table class="table-striped table">
                                         <tr>
-                                            <th class="text-center">Nomor Bukti</th>
-                                            <th class="text-center">Gudang</th>
-                                            <th class="text-center">Pemasok</th>
-                                            <th class="text-center">Produk</th>
-                                            <th class="text-center">Jumlah</th>
-                                            <th class="text-center">Satuan</th>
-                                            <th class="text-center">Harga Satuan</th>
-                                            <th class="text-center">Total</th>
+                                            <th class="text-center">ID Transaksi</th>
+                                            <th class="text-center">Nama Konsumen</th>
+                                            <th class="text-center">Nama Paket</th>
+                                            <th class="text-center">Jumlah Wahana</th>
+                                            <th class="text-center">Jumlah Porsi</th>
                                             <th class="text-center">Tanggal</th>
                                             <th class="text-center">Waktu</th>
                                             <th class="text-center">Aksi</th>
                                         </tr>
                                         @foreach ($histories as $history)
                                             <tr>
-                                                <td class="text-center">{{ $history->nomor_bukti }}</td>
-                                                <td class="text-center">{{ $history->gudang }}</td>
-                                                <td class="text-center">{{ $history->pemasok }}</td>
-                                                <td class="text-center">{{ $history->product->name }}</td>
-                                                <td class="text-center">{{ $history->qty }}</td>
-                                                <td class="text-center">{{ $history->satuan }}</td>
-                                                <td class="text-center">{{ $history->harga_satuan }}</td>
-                                                <td class="text-center">{{ $history->total }}</td>
-                                                <td class="text-center">{{ $history->date }}</td>
-                                                <td class="text-center">{{ $history->time }}</td>
-
+                                                <td class="text-center">{{ $history->id }}</td>
+                                                <td class="text-center">{{ $history->nama_konsumen }}</td>
+                                                <td class="text-center">{{ $history->nama_paket }}</td>
+                                                <td class="text-center">{{ $history->wahana }}</td>
+                                                <td class="text-center">{{ $history->porsi }}</td>
+                                                <td class="text-center">{{ $history->tanggal }}</td>
+                                                <td class="text-center">{{ $history->jam }}</td>
                                                 <td>
                                                     <div class="d-flex justify-content-center">
-                                                        <a href='{{ route('staff.history.edit', $history->id) }}'
-                                                            class="btn btn-sm btn-info btn-icon">
-                                                            <i class="fas fa-edit"></i>
-                                                            Edit
+                                                        {{-- <a href='{{ route('staff.history.edit', $history->id) }}' class="btn btn-sm btn-info btn-icon">
+                                                            <i class="fas fa-edit"></i> Edit --}}
                                                         </a>
 
-                                                        <form action="{{ route('staff.history.destroy', $history->id) }}"
-                                                            method="POST" class="ml-2">
-                                                            <input type="hidden" name="_method" value="DELETE" />
-                                                            <input type="hidden" name="_token"
-                                                                value="{{ csrf_token() }}" />
+                                                        {{-- <form action="{{ route('staff.history.destroy', $history->id) }}" method="POST" class="ml-2">
+                                                            @csrf
+                                                            @method('DELETE')
                                                             <button class="btn btn-sm btn-danger btn-icon confirm-delete">
-                                                                <i class="fas fa-times"></i> Delete
+                                                                <i class="fas fa-times"></i> Hapus
                                                             </button>
-                                                        </form>
+                                                        </form> --}}
                                                     </div>
                                                 </td>
                                             </tr>
                                         @endforeach
-
-
                                     </table>
                                 </div>
+
                                 <div class="float-right">
                                     {{ $histories->withQueryString()->links() }}
                                 </div>

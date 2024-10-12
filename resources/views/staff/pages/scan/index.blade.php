@@ -62,11 +62,34 @@
     }
 
     function onScanSuccess(decodedText, decodedResult) {
-        console.log(`Code matched = ${decodedText}`, decodedResult);
-        document.getElementById('qrcodeInput').value = decodedText;
-        playScanSuccessSound(); // Play sound on successful scan
-        document.getElementById('scanForm').submit();
-    }
+    console.log(`Code matched = ${decodedText}`, decodedResult);
+    document.getElementById('qrcodeInput').value = decodedText;
+    playScanSuccessSound(); // Play sound on successful scan
+
+    // Send the scan result to the server
+    fetch("{{ route('scan.process') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": "{{ csrf_token() }}" // Include CSRF token
+        },
+        body: JSON.stringify({
+            qrcode: decodedText
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Optionally, update the UI or show a success message
+            alert(data.success);
+        } else {
+            alert(data.error); // Handle any errors
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+}
 
     function onScanFailure(error) {
         console.warn(`Code scan error = ${error}`);

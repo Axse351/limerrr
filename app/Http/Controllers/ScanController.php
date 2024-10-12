@@ -25,28 +25,31 @@ class ScanController extends Controller
 
     public function scan(Request $request)
     {
-        // Dapatkan QR code dari request
-        $qrcode = $request->input('qrcode');
-        // dd($qrcode);
-        // Temukan transaksi berdasarkan QR code
-        $transaksi = Transaksi::where('barcode', $qrcode)->first();
+        // Validate the incoming request
+        $request->validate([
+            'qrcode' => 'required|string', // Validate the QR code input
+        ]);
     
-        if ($transaksi) {
-            // Cek apakah wahana masih tersedia
-            if ($transaksi->remaining_wahana > 0) {
-                // Kurangi jumlah wahana
-                $transaksi->remaining_wahana -= 1;
-                $transaksi->save(); // Simpan perubahan 
+        // Find the transaksi associated with the scanned QR code
+        $transaksi = Transaksi::where('barcode', $request->qrcode)->first();
     
-                // Berikan feedback ke pengguna
-                return redirect()->back()->with('success', 'QR Code scanned and wahana decreased by 1');
-            } else {
-                return redirect()->back()->with('error', 'No remaining wahana available');
-            }
-        } else {
-            return redirect()->back()->with('error', 'QR Code not found');
+        if (!$transaksi) {
+            return response()->json(['error' => 'Transaksi not found.'], 404);
         }
-    }    
+    
+        // Check if there are remaining wahana and porsi
+        if ($transaksi->wahana > 0 && $transaksi->porsi > 0) {
+            // Decrement wahana and porsi
+            $transaksi->decrement('wahana'); // Decrease wahana by 1
+            $transaksi->decrement('porsi');   // Decrease porsi by 1
+    
+            // Return success response
+            return response()->json(['success' => 'Scan successful, wahana and porsi decremented.']);
+        } else {
+            return response()->json(['error' => 'Wahana or porsi already exhausted.'], 400);
+        }
+    }
+    
     
     public function scann(Request $request) {
         $qrcode = $request->input('qrcode');

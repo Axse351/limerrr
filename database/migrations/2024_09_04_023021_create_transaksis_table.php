@@ -16,9 +16,9 @@ return new class extends Migration
             $table->string('nm_konsumen');
             $table->string('nohp');
             $table->unsignedBigInteger('paket_id');
-            $table->timestamps(); // Hanya perlu satu kali untuk created_at dan updated_at
-        
             $table->foreign('paket_id')->references('id')->on('pakets')->onDelete('cascade');
+            $table->integer('wahana');
+            $table->integer('porsi');
         });
         
     }

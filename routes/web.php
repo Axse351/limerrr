@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductResultController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\PaketController;
 use App\Http\Controllers\ScanController;
+use App\Http\Controllers\HistoriesController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -110,14 +111,14 @@ Route::middleware(['auth'])->group(function () {
         // Scan routes
         Route::get('scan', [ScanController::class, 'index'])->name('staff.scan.index');
         Route::post('/scan', [ScanController::class, 'scan'])->name('scan.process');
-
+        Route::get('/histories', [HistoriesController::class, 'index'])->name('staff.histories.index');
 
         // Transaksi routes
         Route::get('/transaksi', [TransaksiController::class, 'index'])->name('staff.transaksi.index');
         Route::get('/transaksi/create', [TransaksiController::class, 'create'])->name('staff.transaksi.create');
         Route::post('/transaksi', [TransaksiController::class, 'store'])->name('staff.transaksi.store');
         Route::delete('transaksi/{transaksi}', [TransaksiController::class, 'destroy'])->name('staff.transaksi.destroy');
-
+        Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('staff.transaksi.show');
         // Paket routes
         Route::get('/paket', [PaketController::class, 'index'])->name('staff.paket.index');
         Route::get('/paket/create', [PaketController::class, 'create'])->name('staff.paket.create');

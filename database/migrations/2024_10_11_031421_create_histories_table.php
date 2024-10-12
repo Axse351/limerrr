@@ -13,17 +13,12 @@ return new class extends Migration
     {
         Schema::create('histories', function (Blueprint $table) {
             $table->id();
-            $table->string('nomor_bukti');
-            $table->string('gudang');
-            $table->string('pemasok');
-            $table->foreignId('product_id')->constrained('products')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('transaksi_id')->constrained('transaksis')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->string('jenis_transaksi');
+            $table->date('tanggal');
+            $table->time('jam');
             $table->integer('qty')->default(0);
-            $table->string('satuan');
-            $table->integer('harga_satuan')->default(0);
-            $table->integer('total')->default(0);
-            $table->date('date');
-            $table->time('time');
-            $table->timestamps();
+            $table->timestamps(); // This will automatically create both 'created_at' and 'updated_at' fields
         });
     }
 

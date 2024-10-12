@@ -59,23 +59,30 @@
                                             <th class="text-center">Nama Paket</th>
                                             <th class="text-center">Wahana</th>
                                             <th class="text-center">Porsi</th>
+                                            <th class="text-center">Kode Unik</th>
                                             <th class="text-center">Barcode</th> <!-- Kolom baru untuk barcode -->
                                             <th class="text-center">Aksi</th>
                                         </tr>
                                         @foreach ($transaksis as $transaksi)
+                                        @php
+                                        // Buat kode unik berdasarkan ID dan timestamp created_at
+                                        $kodeUnik = $transaksi->id . '-' . \Carbon\Carbon::parse($transaksi->created_at)->timestamp;
+                                    @endphp
                                         <tr>
                                             <td class="text-center">{{ $transaksi->nm_konsumen }}</td>
                                             <td class="text-center">{{ $transaksi->nohp }}</td>
                                             <td class="text-center">{{ $transaksi->paket->nm_paket }}</td>
                                             <td class="text-center">{{ $transaksi->paket->wahana }}</td>
                                             <td class="text-center">{{ $transaksi->paket->porsi }}</td>
+                                            <td class="text-center">{{ $kodeUnik }}</td> <!-- Tampilkan kode unik -->
                                             <td class="text-center">
                                                 {!! QrCode::size(100)->generate(
                                                     'Nama Konsumen: ' . $transaksi->nm_konsumen . 
                                                     ', Nama Paket: ' . $transaksi->paket->nm_paket . 
                                                     ', Wahana: ' . $transaksi->paket->wahana . 
-                                                    ', Porsi: ' . $transaksi->paket->porsi
-                                                ) !!}<!-- Barcode berdasarkan data porsi -->
+                                                    ', Porsi: ' . $transaksi->paket->porsi . 
+                                                    ', Kode Unik: ' . $transaksi->id . '-' . \Carbon\Carbon::parse($transaksi->created_at)->timestamp
+                                                ) !!}
                                             </td>
                                             <td>
                                                 <div class="d-flex justify-content-center">

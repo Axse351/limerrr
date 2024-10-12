@@ -29,6 +29,10 @@
                     <span  style="color: #1F316F";>Scan Barcode</span></a>
             </li>
             <li class="{{ Request::is('blank-page') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('staff.histories.index') }}"><i class="fa fa-book"  style="color: #1F316F";></i>
+                    <span  style="color: #1F316F";>Histori</span></a>
+            </li>
+            <li class="{{ Request::is('blank-page') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('staff.paket.index') }}"><i class="fa fa-cutlery" style="color: #1F316F";></i>
                     <span  style="color: #1F316F"; >Kategori Menu</span></a>
             </li>
