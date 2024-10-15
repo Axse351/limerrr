@@ -66,6 +66,7 @@
                             <div class="form-group">
                                 <label for="wahana">Wahana:</label>
                                 <input type="text" class="form-control @error('wahana') is-invalid @enderror" name="wahana" id="wahana" readonly>
+                                <input type="hidden" name="wahana" id="wahana_hidden">
                                 @error('wahana')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -73,6 +74,7 @@
                             <div class="form-group">
                                 <label for="porsi">Porsi:</label>
                                 <input type="text" class="form-control @error('porsi') is-invalid @enderror" name="porsi" id="porsi" readonly>
+                                <input type="hidden" name="porsi" id="porsi_hidden">
                                 @error('porsi')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -178,37 +180,51 @@
         });
     </script>
   <script>
-    $(document).ready(function() {
-        $('#nm_paket').change(function() {
-            var paket_Id = $(this).val();
-            if (paket_Id) {
-                $.ajax({
-    url: '{{ route('staff.paket.getPaket', ':id') }}'.replace(':id', paket_Id),
-    type: 'GET',
-    dataType: 'json',
-    success: function(data) {
-    if (data) {
-        $('#wahana').val(data.wahana);
-        $('#porsi').val(data.porsi);
+  $(document).ready(function() {
+    $('#nm_paket').change(function() {
+        var paket_Id = $(this).val();
+        if (paket_Id) {
+            $.ajax({
+                url: '{{ route('staff.paket.getPaket', ':id') }}'.replace(':id', paket_Id),
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    if (data) {
+                        // Mengisi input yang bisa dilihat oleh user
+                        $('#wahana').val(data.wahana);
+                        $('#porsi').val(data.porsi);
 
-        // Ambil nama paket langsung dari dropdown
-        var nm_paket = $('#nm_paket option:selected').text();
+                        // Set hidden input values untuk digunakan oleh controller
+                        $('#wahana_hidden').val(data.wahana);
+                        $('#porsi_hidden').val(data.porsi);
 
-        // Membentuk barcode otomatis dari nm_paket, wahana, dan porsi
-        var barcode = nm_paket + '-' + data.wahana + '-' + data.porsi;
-        $('#barcode').val(barcode); // Isi otomatis barcode
-    }
-}
-                });
-            } else {
-                $('#wahana').val('');
-                $('#porsi').val('');
-            }
-        });
+                        // Membentuk barcode otomatis dari nm_paket, wahana, dan porsi
+                        var nm_paket = $('#nm_paket option:selected').text();
+                        var barcode = nm_paket + '-' + data.wahana + '-' + data.porsi;
+                        $('#barcode').val(barcode);
+                    } else {
+                        $('#wahana').val('');
+                        $('#porsi').val('');
+                        $('#wahana_hidden').val('');
+                        $('#porsi_hidden').val('');
+                        $('#barcode').val('');
+                    }
+                }
+            });
+        } else {
+            $('#wahana').val('');
+            $('#porsi').val('');
+            $('#wahana_hidden').val('');
+            $('#porsi_hidden').val('');
+            $('#barcode').val('');
+        }
     });
+});
+
+
 
 </script>
-<script>
+{{-- <script>
     $(document).ready(function() {
         $('#nm_paket').change(function() {
             var paket_Id = $(this).val();
@@ -235,9 +251,9 @@
                 $('#porsi').val('');
             }
         });
-    });
+    }); 
 
-</script>
+</script> --}}
 <script>
    $(document).ready(function() {
     $('#nm_paket').change(function() {
