@@ -1,4 +1,4 @@
-@extends('staff.layouts.app')
+@extends('admin.layouts.app')
 
 @section('title', 'Riwayat Transaksi')
 
@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ asset('library/selectric/public/selectric.css') }}">
 @endpush
 
-@section('staff.content')
+@section('admin.content')
     <div class="main-content">
         <section class="section">
             <div class="section-header">
@@ -21,7 +21,7 @@
             <div class="section-body">
                 <div class="row">
                     <div class="col-12">
-                        @include('staff.layouts.alert')
+                        @include('admin.layouts.alert')
                     </div>
                 </div>
 
@@ -34,15 +34,18 @@
                             <div class="card-body">
 
                                 {{-- <div class="float-left">
-                                    <a href="{{ route('staff.history.create') }}" class="btn btn-primary">Tambah Riwayat</a>
+                                    <a href="{{ route('admin.history.create') }}" class="btn btn-primary">Tambah Riwayat</a>
                                 </div> --}}
 
                                 <div class="float-right">
-                                    <form id="scanForm" action="{{ route('scan.process') }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="qrcode" id="qrcodeInput"> <!-- Holds the scanned QR code -->
-                                        <input type="hidden" name="action" id="actionInput"> <!-- Holds the selected action (wahana/porsi) -->
-                                    </form>                                    
+                                    <form method="GET" action="{{ route('admin.histories.index') }}">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" placeholder="Cari transaksi" name="search">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-primary"><i class="fas fa-search"></i></button>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
 
                                 <div class="clearfix mb-3"></div>
@@ -50,28 +53,31 @@
                                 <div class="table-responsive">
                                     <table class="table-striped table">
                                         <tr>
-                                            <th class="text-center">ID</th>
-                                            <th class="text-center">Id Transaksi</th>
-                                            <th class="text-center">Jenis Transaksi</th>
+                                            <th class="text-center">ID Transaksi</th>
+                                            <th class="text-center">Nama Konsumen</th>
+                                            <th class="text-center">Nama Paket</th>
+                                            <th class="text-center">Jumlah Wahana</th>
+                                            <th class="text-center">Jumlah Porsi</th>
                                             <th class="text-center">Tanggal</th>
-                                            <th class="text-center">Jam</th>
-                                            <th class="text-center">qty</th>
+                                            <th class="text-center">Waktu</th>
+                                            <th class="text-center">Aksi</th>
                                         </tr>
-                                        @foreach ($histories as $histories)
+                                        @foreach ($histories as $history)
                                             <tr>
-                                                <td class="text-center">{{ $histories->id }}</td>
-                                                <td class="text-center">{{ $histories->transaksi_id }}</td>
-                                                <td class="text-center">{{ $histories->jenis_transaksi }}</td>
-                                                <td class="text-center">{{ $histories->tanggal }}</td>
-                                                <td class="text-center">{{ $histories->jam }}</td>
-                                                <td class="text-center">{{ $histories->qty }}</td>
+                                                <td class="text-center">{{ $history->id }}</td>
+                                                <td class="text-center">{{ $history->nama_konsumen }}</td>
+                                                <td class="text-center">{{ $history->nama_paket }}</td>
+                                                <td class="text-center">{{ $history->wahana }}</td>
+                                                <td class="text-center">{{ $history->porsi }}</td>
+                                                <td class="text-center">{{ $history->tanggal }}</td>
+                                                <td class="text-center">{{ $history->jam }}</td>
                                                 <td>
                                                     <div class="d-flex justify-content-center">
-                                                        {{-- <a href='{{ route('staff.history.edit', $history->id) }}' class="btn btn-sm btn-info btn-icon">
+                                                        {{-- <a href='{{ route('admin.history.edit', $history->id) }}' class="btn btn-sm btn-info btn-icon">
                                                             <i class="fas fa-edit"></i> Edit --}}
                                                         </a>
 
-                                                        {{-- <form action="{{ route('staff.history.destroy', $history->id) }}" method="POST" class="ml-2">
+                                                        {{-- <form action="{{ route('admin.history.destroy', $history->id) }}" method="POST" class="ml-2">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button class="btn btn-sm btn-danger btn-icon confirm-delete">

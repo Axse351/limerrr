@@ -54,10 +54,11 @@ Route::middleware(['auth'])->group(function () {
             return view('admin.pages.dashboard');
         })->name('admin.dashboard');  
 
-        Route::get('transaksi', [TransaksiController::class, 'index_admin'])->name('admin.transaksi.index');
+        Route::get('/admin/transaksi', [TransaksiController::class, 'index_admin'])->name('admin.transaksi.index');
         Route::put('transaksi/{transaksi}', [TransaksiController::class, 'update_admin'])->name('admin.transaksi.update');
         Route::get('admin/transaksi/create', [TransaksiController::class, 'createadmin'])->name('admin.transaksi.create');
-        Route::post('admin/transaksi/store', [TransaksiController::class, 'store'])->name('admin.transaksi.store');
+        Route::post('admin/transaksi/store', [TransaksiController::class, 'storeadmin'])->name('admin.transaksi.store');
+        Route::delete('transaksi/{transaksi}', [TransaksiController::class, 'destroy_two'])->name('admin.transaksi.destroy');
 
         //Route scan
         Route::get('scan', [ScanController::class, 'indexscan'])->name('admin.scan.index');
@@ -65,6 +66,8 @@ Route::middleware(['auth'])->group(function () {
         // Route::get('/transaksi/create', [TransaksiController::class, 'create'])->name('staff.transaksi.create');
         // Route::post('/transaksi', [TransaksiController::class, 'store'])->name('staff.transaksi.store');
         
+        //route histories
+        Route::get('/histories', [HistoriesController::class, 'index_admin'])->name('admin.histories.index');
 
         // Paket routes
         Route::get('/paket', [PaketController::class, 'index_admin'])->name('admin.paket.index');
@@ -89,7 +92,7 @@ Route::middleware(['auth'])->group(function () {
             })->name('scan2.dashboard');
 
             Route::get('scan', [ScanController::class, 'scan_two'])->name('scan2.scan.index');
-            Route::post('scan', [ScanController::class, 'scannnn'])->name('scan.process');
+            // Route::post('scan', [ScanController::class, 'scannnn'])->name('scan.process');
             
         });
 
@@ -110,7 +113,8 @@ Route::middleware(['auth'])->group(function () {
 
         // Scan routes
         Route::get('scan', [ScanController::class, 'index'])->name('staff.scan.index');
-        Route::post('/scan', [ScanController::class, 'scan'])->name('scan.process');
+        Route::post('/scan', [ScanController::class, 'scan'])->name('staff.scan.process');
+        // Route::post('/scan/process', [ScanController::class, 'scan'])->name('scan.process');
         Route::get('/histories', [HistoriesController::class, 'index'])->name('staff.histories.index');
 
         // Transaksi routes

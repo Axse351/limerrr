@@ -15,4 +15,5 @@ class Histories extends Model
         'jam',
         'qty',
     ];
+
 }

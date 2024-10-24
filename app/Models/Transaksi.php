@@ -11,15 +11,13 @@ class Transaksi extends Model
 
     // Nama tabel di database
     protected $table = 'transaksis';
+    public $timestamps = true;
 
     // Kolom yang bisa diisi
     protected $fillable = [
         'nm_konsumen',
         'nohp',
         'paket_id',
-        'wahana',
-        'porsi',
-        'barcode',
     ];
 
     /**
@@ -27,6 +25,12 @@ class Transaksi extends Model
      * 
      * A Transaksi belongs to a Paket.
      */
+
+     public function setUpdatedAt($value)
+    {
+        // Do nothing
+    }
+
     public function paket()
     {
         return $this->belongsTo(Paket::class, 'paket_id');

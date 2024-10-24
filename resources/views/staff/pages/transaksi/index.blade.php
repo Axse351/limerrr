@@ -5,6 +5,14 @@
 @push('style')
     <!-- CSS Libraries -->
     <link rel="stylesheet" href="{{ asset('library/selectric/public/selectric.css') }}">
+    <style>
+        .pagination {
+            font-size: 0.875rem; /* Adjust the font size */
+        }
+        .pagination .page-link {
+            padding: 0.25rem 0.5rem; /* Adjust the padding to reduce size */
+        }
+    </style>
 @endpush
 
 @section('staff.content')
@@ -99,10 +107,9 @@
                                         @endforeach
                                     </table>
                                 </div>
-                                {{-- <div class="float-right" style="width: 100px">
-                                    {{ $transaksis->withQueryString()->links() }}
-                                </div> --}}
-                            </div>
+                                <div class="float-right">
+                                    {{ $transaksis->withQueryString()->links('pagination::bootstrap-4', ['class' => 'pagination-sm']) }}
+                                </div>
                         </div>
                     </div>
                 </div>

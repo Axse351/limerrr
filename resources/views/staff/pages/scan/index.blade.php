@@ -3,12 +3,11 @@
 @section('title', 'Scan QR Code')
 
 @push('style')
-    <!-- Add custom styles if needed -->
     <style>
         #qr-reader {
-            width: 100%; /* Full width for responsive design */
-            height: auto; /* Auto height */
-            display: none; /* Initially hidden */
+            width: 100%;
+            height: auto;
+            display: none;
         }
     </style>
 @endpush
@@ -33,21 +32,52 @@
                                 <h4>Scan QR Code</h4>
                             </div>
                             <div class="card-body">
-                                <div id="qr-reader"></div> <!-- Responsive QR reader -->
+                                <div id="qr-reader"></div>
                                 <button id="start-scan-btn" class="btn btn-primary mb-3">Start Scan</button>
                                 <form id="scanForm" action="{{ route('scan.process') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="qrcode" id="qrcodeInput">
+                                    <input type="hidden" name="action" id="actionInput">
                                 </form>
-                                <!-- Add audio element for scan success sound -->
                                 <audio id="scanSuccessSound" src="{{ asset('sounds/scan-success.mp3') }}"></audio>
-                                <h5 class="mt-4">Jumlah wahana tersisa: {{ $transaksi->remaining_wahana ?? 'Tidak tersedia' }}</h5>
                             </div>
                         </div>
                     </div>
                 </div>
+
+              
+
             </div>
         </section>
+    </div>
+
+      <!-- Modal for displaying scan result and dropdown -->
+      <div class="modal fade" id="scanResultModal" tabindex="-1" role="dialog" aria-labelledby="scanResultModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="scanResultModalLabel">Scan Result</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="scanResultText"></p>
+                    <!-- Dropdown for selecting action -->
+                    <div class="form-group">
+                        <label for="actionSelect">Choose Action:</label>
+                        <select class="form-control" id="actionSelect">
+                            <option value="wahana">Pengurangan Wahana</option>
+                            <option value="porsi">Pengurangan Porsi</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="confirmActionBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -61,35 +91,20 @@
         audio.play(); // Play the sound
     }
 
-    function onScanSuccess(decodedText, decodedResult) {
-    console.log(`Code matched = ${decodedText}`, decodedResult);
-    document.getElementById('qrcodeInput').value = decodedText;
-    playScanSuccessSound(); // Play sound on successful scan
+    // Show modal popup with scan result and action dropdown
+    function showScanResult(decodedText) {
+        document.getElementById('scanResultText').textContent = decodedText;
+        $('#scanResultModal').modal('show'); // Show the Bootstrap modal
+    }
 
-    // Send the scan result to the server
-    fetch("{{ route('scan.process') }}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-Token": "{{ csrf_token() }}" // Include CSRF token
-        },
-        body: JSON.stringify({
-            qrcode: decodedText
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Optionally, update the UI or show a success message
-            alert(data.success);
-        } else {
-            alert(data.error); // Handle any errors
-        }
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
-}
+    function onScanSuccess(decodedText, decodedResult) {
+        console.log(`Code matched = ${decodedText}`, decodedResult);
+        document.getElementById('qrcodeInput').value = decodedText;
+        playScanSuccessSound(); // Play sound on successful scan
+
+        // Show the scan result in a modal popup
+        showScanResult(decodedText);
+    }
 
     function onScanFailure(error) {
         console.warn(`Code scan error = ${error}`);
@@ -103,5 +118,18 @@
         });
         html5QrcodeScanner.render(onScanSuccess, onScanFailure);
     });
+
+    // Handle the Confirm button click in the modal
+  
+</script>
+<script>
+      document.getElementById('confirmActionBtn').addEventListener('click', function() {
+        const selectedAction = document.getElementById('actionSelect').value;
+        document.getElementById('actionInput').value = selectedAction; // Set the action input value
+
+        // Submit the form
+        document.getElementById('scanForm').submit();
+    });
 </script>
 @endpush
+

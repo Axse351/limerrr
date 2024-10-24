@@ -3,12 +3,11 @@
 @section('title', 'Scan QR Code')
 
 @push('style')
-    <!-- Add custom styles if needed -->
     <style>
         #qr-reader {
-            width: 100%; /* Full width for responsive design */
-            height: auto; /* Auto height */
-            display: none; /* Initially hidden */
+            width: 100%;
+            height: auto;
+            display: none;
         }
     </style>
 @endpush
@@ -17,7 +16,7 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header">
-                <h1>Scan QR Code Admin</h1>
+                <h1>Scan QR Code</h1>
             </div>
             <div class="section-body">
                 <div class="row">
@@ -33,20 +32,52 @@
                                 <h4>Scan QR Code</h4>
                             </div>
                             <div class="card-body">
-                                <div id="qr-reader"></div> <!-- Responsive QR reader -->
+                                <div id="qr-reader"></div>
                                 <button id="start-scan-btn" class="btn btn-primary mb-3">Start Scan</button>
-                                <form id="scanForm" action="{{ route('scann.process') }}" method="POST">
+                                <form id="scanForm" action="{{ route('scan.process') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="qrcode" id="qrcodeInput">
+                                    <input type="hidden" name="action" id="actionInput">
                                 </form>
-                                <!-- Add audio element for scan success sound -->
                                 <audio id="scanSuccessSound" src="{{ asset('sounds/scan-success.mp3') }}"></audio>
                             </div>
                         </div>
                     </div>
                 </div>
+
+              
+
             </div>
         </section>
+    </div>
+
+      <!-- Modal for displaying scan result and dropdown -->
+      <div class="modal fade" id="scanResultModal" tabindex="-1" role="dialog" aria-labelledby="scanResultModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="scanResultModalLabel">Scan Result</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="scanResultText"></p>
+                    <!-- Dropdown for selecting action -->
+                    <div class="form-group">
+                        <label for="actionSelect">Choose Action:</label>
+                        <select class="form-control" id="actionSelect">
+                            <option value="wahana">Pengurangan Wahana</option>
+                            <option value="porsi">Pengurangan Porsi</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="confirmActionBtn">Confirm</button>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -60,11 +91,19 @@
         audio.play(); // Play the sound
     }
 
+    // Show modal popup with scan result and action dropdown
+    function showScanResult(decodedText) {
+        document.getElementById('scanResultText').textContent = decodedText;
+        $('#scanResultModal').modal('show'); // Show the Bootstrap modal
+    }
+
     function onScanSuccess(decodedText, decodedResult) {
         console.log(`Code matched = ${decodedText}`, decodedResult);
         document.getElementById('qrcodeInput').value = decodedText;
         playScanSuccessSound(); // Play sound on successful scan
-        document.getElementById('scanForm').submit();
+
+        // Show the scan result in a modal popup
+        showScanResult(decodedText);
     }
 
     function onScanFailure(error) {
@@ -79,5 +118,18 @@
         });
         html5QrcodeScanner.render(onScanSuccess, onScanFailure);
     });
+
+    // Handle the Confirm button click in the modal
+  
+</script>
+<script>
+      document.getElementById('confirmActionBtn').addEventListener('click', function() {
+        const selectedAction = document.getElementById('actionSelect').value;
+        document.getElementById('actionInput').value = selectedAction; // Set the action input value
+
+        // Submit the form
+        document.getElementById('scanForm').submit();
+    });
 </script>
 @endpush
+
