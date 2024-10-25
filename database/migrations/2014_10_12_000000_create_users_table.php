@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('role', ['admin', 'staff'])->default('staff');
             $table->rememberToken();
             $table->timestamps();
+            $table->string('namawahana');
         });
     }
 

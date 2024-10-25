@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use PhpParser\Node\Stmt\ElseIf_;
 
 class AuthController extends Controller
 {
@@ -65,6 +66,8 @@ public function loginStore(Request $request)
             return redirect()->route('scan1.dashboard');
         } elseif ($user->role == 'scan2') {
             return redirect()->route('scan2.dashboard');
+        } elseif ($user->role == 'scan3') {
+            return redirect()->route('scan3.dashboard');
         }
     } else {
         return back()->withInput()->with('error', 'Login gagal, silakan coba lagi.');

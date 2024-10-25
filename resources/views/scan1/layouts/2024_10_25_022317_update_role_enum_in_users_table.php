@@ -9,21 +9,20 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::table('transaksis', function (Blueprint $table) {
-            $table->integer('porsi')->default(0); // Pastikan porsi default-nya 0 atau nilai yang diinginkan
+        Schema::table('users', function (Blueprint $table) {
+            $table->enum('role', ['admin', 'staff', 'scan1', 'scan2', 'scan3'])->default('staff')->change();
         });
     }
-    
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::table('transaksi', function (Blueprint $table) {
-            //
+        Schema::table('users', function (Blueprint $table) {
+            $table->enum('role', ['admin', 'staff'])->default('staff')->change();
         });
     }
 };

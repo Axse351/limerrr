@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Histories; // Model History
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class HistoriesController extends Controller
 {
@@ -30,5 +31,21 @@ class HistoriesController extends Controller
         })->paginate(10); // Pagination data
         
         return view('admin.pages.histories.index', compact('histories', 'barcode'));
+    }
+    public function store(Request $request)
+    {
+        $user = Auth::user(); // Get the currently logged-in user
+        
+        Histories::create([
+            'transaksi_id' => $request->transaksi_id,
+            'jenis_transaksi' => $request->jenis_transaksi,
+            'tanggal' => now(),
+            'jam' => now()->format('H:i:s'),
+            'qty' => $request->qty,
+            'user_id' => $user->id,
+            'namawahana' => $user->namawahana, // Insert namawahana from user
+        ]);
+
+        return redirect()->back()->with('success', 'History added successfully');
     }
 }

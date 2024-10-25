@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Transaksi;
 use App\Models\Paket;
 use App\Models\Histories;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\VarDumper\Caster\RedisCaster;
 
 class ScanController extends Controller
@@ -31,6 +32,46 @@ class ScanController extends Controller
     }
 
     public function scan(Request $request)
+    {
+        $validatedData = $request->validate([
+            'qrcode' => 'required',
+            // Other validations if necessary
+        ]);
+    
+        // Process the scanned QR code
+        $scannedData = $validatedData['qrcode'];
+    
+        // Example: Assume the scanned QR code corresponds to a transaction ID
+        // You need to replace this logic with how you retrieve the transaksi_id
+        $transaction = Transaksi::where('qrcode', $scannedData)->first(); // Adjust this line according to your logic
+    
+        if (!$transaction) {
+            return redirect()->back()->with('error', 'Transaction not found for the scanned QR code.');
+        }
+    
+        $transaksiId = $transaction->id; // Get the transaction ID
+    
+        // Get the authenticated user or fetch the relevant user
+        $user = auth()->user(); // or User::find($userId) if you have a specific user ID
+    
+        // Prepare data for insertion into the histories table
+        $historyData = [
+            'transaksi_id' => $transaksiId, // Now it's correctly defined
+            'jenis_transaksi' => 'some type', // Set the transaction type
+            'tanggal' => now()->toDateString(),
+            'jam' => now()->toTimeString(),
+            'qty' => 1, // Set quantity appropriately
+            'namawahana' => $user->namawahana, // Get namawahana from the user
+        ];
+    
+        // Insert into the histories table
+        Histories::create($historyData);
+    
+        // Redirect or return a response
+        return redirect()->back()->with('success', 'Data scanned successfully!');
+    }
+    
+    public function scancoba(Request $request)
     {
         
         $request->validate([

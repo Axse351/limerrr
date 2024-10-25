@@ -6,27 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('transaksis', function (Blueprint $table) {
-            $table->id(); // Ini sudah cukup untuk membuat kolom ID sebagai primary key
-            $table->string('nm_konsumen');
-            $table->string('nohp');
-            $table->unsignedBigInteger('paket_id');
-            $table->foreign('paket_id')->references('id')->on('pakets')->onDelete('cascade');
-            $table->integer('wahana');
-            $table->integer('porsi');
-            $table->timestamp('');
+            $table->id(); // Creates the id column
+            $table->string('nm_konsumen'); // Name of the consumer
+            $table->string('nohp'); // Phone number
+            $table->foreignId('paket_id')->constrained('pakets')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->integer('wahana'); // Number of rides
+            $table->integer('porsi'); // Number of portions
+            $table->timestamps(); // Creates 'created_at' and 'updated_at' columns
         });
-        
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('transaksis');

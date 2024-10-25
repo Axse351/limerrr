@@ -13,12 +13,25 @@ return new class extends Migration
     {
         Schema::create('histories', function (Blueprint $table) {
             $table->id();
+            
+            // Foreign key reference to the 'transaksis' table
             $table->foreignId('transaksi_id')->constrained('transaksis')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('jenis_transaksi');
-            $table->date('tanggal');
-            $table->time('jam');
-            $table->integer('qty')->default(0);
-            $table->timestamps(); // This will automatically create both 'created_at' and 'updated_at' fields
+            
+            // New field for transaction type
+            $table->string('jenis_transaksi');  
+            
+            // Fields for date and time of transaction
+            $table->date('tanggal');            
+            $table->time('jam');                
+            
+            // Quantity field with a default value
+            $table->integer('qty')->default(0); 
+            
+            // New field for 'namawahana' to be retrieved from users table
+            $table->string('namawahana')->nullable(); // You can also set it to not nullable based on your requirement
+            
+            // Timestamps for created and updated records
+            $table->timestamps(); 
         });
     }
 
