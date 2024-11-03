@@ -157,10 +157,9 @@
 
                 $.ajax({
                     url: '{{ route('staff.histories.store') }}',
-                    method: 'POST',
+                    _method: 'POST',
+                    _token: '{{ csrf_token() }}',
                     data: formData,
-                    processData: false,
-                    contentType: false,
                     success: function(response) {
                         console.log(response);
                         $('#scanResultModal').modal('hide');
