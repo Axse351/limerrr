@@ -130,7 +130,6 @@
                 }
 
                 const formData = new FormData();
-                // formData.append('qrcode', scanResultText);
                 formData.append('jenis_transaksi', selectedAction);
                 formData.append('tanggal', new Date().toISOString().split('T')[0]);
                 formData.append('jam', new Date().toTimeString().split(' ')[0]);
@@ -142,7 +141,7 @@
                 let idTransaksi = kodee[3].substring(0, 1);
                 console.log(idTransaksi)
 
-                // formData.append('transaksi_id', idTransaksi);
+                formData.append('transaksi_id', idTransaksi);
 
                 // for (let [key, value] of formData.entries()) {
                 //     console.log(`${key}: ${value}`);
@@ -156,16 +155,22 @@
 
                 console.log("Form action URL:", '{{ route('staff.histories.store') }}');
 
-                fetch('{{ route('staff.histories.store') }}', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: formData,
-                    })
-                    .then(response => response.json())
-                    .then(data => console.log(data))
-                    .catch(error => console.error('Error:', error));
+                $.ajax({
+                    url: '{{ route('staff.histories.store') }}',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        console.log(response);
+                        $('#scanResultModal').modal('hide');
+                        window.location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                        alert('An error occurred. Please try again.');
+                    }
+                });
 
 
             });
