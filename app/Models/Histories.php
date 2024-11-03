@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Histories extends Model
 {
-   
+
+    protected $table = 'histories';
     protected $fillable = [
         'transaksi_id',
         'jenis_transaksi',
@@ -28,5 +29,4 @@ class Histories extends Model
     {
         return $this->belongsTo(Transaksi::class, 'transaksi_id'); // Ensure foreign key matches
     }
-
 }

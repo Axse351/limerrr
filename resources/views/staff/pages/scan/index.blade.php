@@ -130,16 +130,28 @@
                 }
 
                 const formData = new FormData();
-                formData.append('qrcode', scanResultText);
+                // formData.append('qrcode', scanResultText);
                 formData.append('jenis_transaksi', selectedAction);
                 formData.append('tanggal', new Date().toISOString().split('T')[0]);
                 formData.append('jam', new Date().toTimeString().split(' ')[0]);
                 formData.append('_token', '{{ csrf_token() }}');
                 formData.append('qty', '1'); // Default quantity
 
-                for (let [key, value] of formData.entries()) {
-                    console.log(`${key}: ${value}`);
-                }
+                let qr = scanResultText.split(",");
+                let kodee = qr['4'].split(' ');
+                let idTransaksi = kodee[3].substring(0, 1);
+                console.log(idTransaksi)
+
+                // formData.append('transaksi_id', idTransaksi);
+
+                // for (let [key, value] of formData.entries()) {
+                //     console.log(`${key}: ${value}`);
+                //     // formData.append($ {
+                //     //     key
+                //     // }, $ {
+                //     //     value
+                //     // });
+                // }
 
 
                 console.log("Form action URL:", '{{ route('staff.histories.store') }}');
@@ -168,4 +180,3 @@
         });
     </script>
 @endpush
-alur program saya : saya scan di index codingan tsb, lalu data terambil dari data di database, kemudian data tersebut bisa dikurangi jatahnya dengan select yg ad di modal. Nah saat mau confirm di modal terdapat error berupa button tidak dapat ditekan. bagaimana solusinya sehingga tombol bisa ditekan dan pengurangan tsb bisa masuk ke tabel history di database?

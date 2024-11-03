@@ -43,23 +43,17 @@ class HistoriesController extends Controller
     public function store(Request $request)
     {
         // Validate the incoming data and handle validation errors
-        $validatedData = $request->validate([
-            'qrcode' => 'required|string',
-            'jenis_transaksi' => 'required|string',
-            'qty' => 'required|integer',
-            'tanggal' => 'required|date',
-            'jam' => 'required|string',
-        ]);
+        // $validatedData = $request->validate([
+        //     'transaksi_id' => 'required',
+        //     'jenis_transaksi' => 'required',
+        //     'qty' => 'required',
+        //     'tanggal' => 'required',
+        //     'jam' => 'required',
+        // ]);
 
         try {
             // Attempt to create a new history record
-            $history = History::create([
-                'qrcode' => $validatedData['qrcode'],
-                'jenis_transaksi' => $validatedData['jenis_transaksi'],
-                'qty' => $validatedData['qty'],
-                'tanggal' => $validatedData['tanggal'],
-                'jam' => $validatedData['jam'],
-            ]);
+            $history = Histories::create($request);
 
             // Check if history was successfully created
             if ($history) {
@@ -76,12 +70,13 @@ class HistoriesController extends Controller
                 ], 500);
             }
         } catch (\Exception $e) {
-            // Catch any unexpected errors and provide feedback
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred while processing your request.',
-                'error' => $e->getMessage() // Only include in debugging or remove in production
-            ], 500);
+            dd($e);
+            // // Catch any unexpected errors and provide feedback
+            // return response()->json([
+            //     'success' => false,
+            //     'message' => 'An error occurred while processing your request.',
+            //     'error' => $e->getMessage() // Only include in debugging or remove in production
+            // ], 500);
         }
     }
 
