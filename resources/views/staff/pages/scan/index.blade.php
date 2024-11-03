@@ -34,25 +34,19 @@
                             <div class="card-body">
                                 <div id="qr-reader"></div>
                                 <button id="start-scan-btn" class="btn btn-primary mb-3">Start Scan</button>
-                                <form id="scanForm" action="{{ route('scan.process') }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="qrcode" id="qrcodeInput">
-                                    <input type="hidden" name="action" id="actionInput">
-                                </form>
+                                <input type="file" id="qr-upload" accept="image/*" class="btn btn-secondary mb-3">
                                 <audio id="scanSuccessSound" src="{{ asset('sounds/scan-success.mp3') }}"></audio>
                             </div>
                         </div>
                     </div>
                 </div>
-
-              
-
             </div>
         </section>
     </div>
 
-      <!-- Modal for displaying scan result and dropdown -->
-      <div class="modal fade" id="scanResultModal" tabindex="-1" role="dialog" aria-labelledby="scanResultModalLabel" aria-hidden="true">
+    <!-- Modal for displaying scan result and dropdown -->
+    <div class="modal fade" id="scanResultModal" tabindex="-1" role="dialog" aria-labelledby="scanResultModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -82,54 +76,96 @@
 @endsection
 
 @push('scripts')
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-<script>
-    // Play sound on successful scan
-    function playScanSuccessSound() {
-        const audio = document.getElementById('scanSuccessSound');
-        audio.currentTime = 0; // Reset to the start of the sound
-        audio.play(); // Play the sound
-    }
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script>
+        $(document).ready(function() {
+            // Function to play sound on successful scan
+            function playScanSuccessSound() {
+                const audio = document.getElementById('scanSuccessSound');
+                audio.currentTime = 0;
+                audio.play();
+            }
 
-    // Show modal popup with scan result and action dropdown
-    function showScanResult(decodedText) {
-        document.getElementById('scanResultText').textContent = decodedText;
-        $('#scanResultModal').modal('show'); // Show the Bootstrap modal
-    }
+            function showScanResult(decodedText) {
+                document.getElementById('scanResultText').textContent = decodedText;
+                $('#scanResultModal').modal('show');
+            }
 
-    function onScanSuccess(decodedText, decodedResult) {
-        console.log(`Code matched = ${decodedText}`, decodedResult);
-        document.getElementById('qrcodeInput').value = decodedText;
-        playScanSuccessSound(); // Play sound on successful scan
+            function onScanSuccess(decodedText) {
+                playScanSuccessSound();
+                showScanResult(decodedText);
+                document.getElementById('qrcodeInput').value = decodedText;
+            }
 
-        // Show the scan result in a modal popup
-        showScanResult(decodedText);
-    }
+            function onScanFailure(error) {
+                console.warn(`Code scan error = ${error}`);
+            }
 
-    function onScanFailure(error) {
-        console.warn(`Code scan error = ${error}`);
-    }
+            document.getElementById('start-scan-btn').addEventListener('click', function() {
+                document.getElementById('qr-reader').style.display = 'block';
+                const html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", {
+                    fps: 10,
+                    qrbox: 250
+                });
+                html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+            });
 
-    document.getElementById('start-scan-btn').addEventListener('click', function() {
-        document.getElementById('qr-reader').style.display = 'block'; // Show the QR reader
-        const html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { 
-            fps: 10, 
-            qrbox: 250 
+            document.getElementById('qr-upload').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const html5QrCode = new Html5Qrcode("qr-reader");
+                    html5QrCode.scanFile(file, true)
+                        .then(onScanSuccess)
+                        .catch(onScanFailure);
+                }
+            });
+
+            document.getElementById('confirmActionBtn').addEventListener('click', function() {
+                const selectedAction = document.getElementById('actionSelect').value;
+                const scanResultText = document.getElementById('scanResultText').textContent;
+
+                if (!scanResultText) {
+                    alert('Scan result is required.');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('qrcode', scanResultText);
+                formData.append('jenis_transaksi', selectedAction);
+                formData.append('tanggal', new Date().toISOString().split('T')[0]);
+                formData.append('jam', new Date().toTimeString().split(' ')[0]);
+                formData.append('_token', '{{ csrf_token() }}');
+                formData.append('qty', '1'); // Default quantity
+
+                for (let [key, value] of formData.entries()) {
+                    console.log(`${key}: ${value}`);
+                }
+
+
+                console.log("Form action URL:", '{{ route('staff.histories.store') }}');
+
+                fetch('{{ route('staff.histories.store') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: formData,
+                    })
+                    .then(response => response.json())
+                    .then(data => console.log(data))
+                    .catch(error => console.error('Error:', error));
+
+
+            });
+
+            function createHiddenInput(name, value) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                input.value = value;
+                return input;
+            }
         });
-        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-    });
-
-    // Handle the Confirm button click in the modal
-  
-</script>
-<script>
-      document.getElementById('confirmActionBtn').addEventListener('click', function() {
-        const selectedAction = document.getElementById('actionSelect').value;
-        document.getElementById('actionInput').value = selectedAction; // Set the action input value
-
-        // Submit the form
-        document.getElementById('scanForm').submit();
-    });
-</script>
+    </script>
 @endpush
-
+alur program saya : saya scan di index codingan tsb, lalu data terambil dari data di database, kemudian data tersebut bisa dikurangi jatahnya dengan select yg ad di modal. Nah saat mau confirm di modal terdapat error berupa button tidak dapat ditekan. bagaimana solusinya sehingga tombol bisa ditekan dan pengurangan tsb bisa masuk ke tabel history di database?

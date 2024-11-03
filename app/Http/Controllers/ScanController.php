@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Transaksi;
 use App\Models\Paket;
 use App\Models\Histories;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\VarDumper\Caster\RedisCaster;
 
@@ -34,46 +35,83 @@ class ScanController extends Controller
     public function scan(Request $request)
     {
         $validatedData = $request->validate([
-            'qrcode' => 'required',
-            // Other validations if necessary
+            'qrcode' => 'required|string',
+            'action' => 'required|string', // Pastikan 'action' ada dalam request
         ]);
-    
-        // Process the scanned QR code
+
+        Log::info('Validated Data:', $validatedData);
+
+        // Ambil data yang dipindai dan aksi yang dipilih
         $scannedData = $validatedData['qrcode'];
-    
-        // Example: Assume the scanned QR code corresponds to a transaction ID
-        // You need to replace this logic with how you retrieve the transaksi_id
-        $transaction = Transaksi::where('qrcode', $scannedData)->first(); // Adjust this line according to your logic
-    
+        $action = $validatedData['action'];
+
+        // Temukan transaksi berdasarkan QR code
+        $transaction = Transaksi::where('qrcode', $scannedData)->first();
+
         if (!$transaction) {
-            return redirect()->back()->with('error', 'Transaction not found for the scanned QR code.');
+            return redirect()->back()->with('error', 'Transaksi tidak ditemukan untuk QR code yang dipindai.');
         }
-    
-        $transaksiId = $transaction->id; // Get the transaction ID
-    
-        // Get the authenticated user or fetch the relevant user
-        $user = auth()->user(); // or User::find($userId) if you have a specific user ID
-    
-        // Prepare data for insertion into the histories table
+
+        // Ambil paket terkait untuk memeriksa jumlah yang tersedia
+        $paket = Paket::find($transaction->paket_id); // Mengasumsikan Anda memiliki paket_id di model transaksi
+
+        if (!$paket) {
+            return redirect()->back()->with('error', 'Paket tidak ditemukan.');
+        }
+
+        // Hitung total sejarah yang ada untuk transaksi ini
+        $totalHistories = Histories::where('transaksi_id', $transaction->id)
+            ->where('jenis_transaksi', $action === 'wahana' ? 'Pengurangan Wahana' : 'Pengurangan Porsi')
+            ->sum('qty');
+
+        // Tentukan batas untuk pemindaian
+        $availableQuantity = $paket->quantity; // Mengasumsikan jumlah tersedia disimpan di model paket
+        if ($totalHistories >= $availableQuantity) {
+            return redirect()->back()->with('error', 'Tidak dapat memindai: batas terlampaui untuk paket ini.');
+        }
+
+        // Lanjutkan dengan pemindaian
+        $transaksiId = $transaction->id;
+        $user = auth()->user();
+        $jenisTransaksi = $action === 'wahana' ? 'Pengurangan Wahana' : 'Pengurangan Porsi';
+
+        // Siapkan data untuk tabel histories
         $historyData = [
-            'transaksi_id' => $transaksiId, // Now it's correctly defined
-            'jenis_transaksi' => 'some type', // Set the transaction type
+            'transaksi_id' => $transaksiId,
+            'jenis_transaksi' => $jenisTransaksi,
             'tanggal' => now()->toDateString(),
             'jam' => now()->toTimeString(),
-            'qty' => 1, // Set quantity appropriately
-            'namawahana' => $user->namawahana, // Get namawahana from the user
+            'qty' => 1, // Ubah sesuai kebutuhan, ini bisa dinamis berdasarkan kasus penggunaan Anda
+            'user_id' => $user->id, // Sertakan ID pengguna untuk pelacakan
+            'namawahana' => $user->namawahana, // Pastikan properti ini ada di model pengguna Anda
         ];
-    
-        // Insert into the histories table
-        Histories::create($historyData);
-    
-        // Redirect or return a response
-        return redirect()->back()->with('success', 'Data scanned successfully!');
+        Log::info('History Data to Save:', $historyData);
+        // Insert rekaman sejarah
+        try {
+            Histories::create($historyData);
+            Log::info('History created successfully:', $historyData);
+        } catch (\Exception $e) {
+            Log::error('Error saving history:', ['error' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data.');
+        }
+
+        return redirect()->back()->with('success', 'Data berhasil dipindai dan disimpan di histories!');
     }
-    
+
+
+    public function showScanForm()
+    {
+        // Logic to get transaksi_id based on conditions, e.g., fetching from the database
+        $transaksiId = 'your_transaction_id_here'; // Example value or fetched from DB
+
+        return view('staff.pages.histories.index', compact('transaksiId'));
+    }
+
+
+
     public function scancoba(Request $request)
     {
-        
+
         $request->validate([
             'qrcode' => 'required|string', // Validate the QR code
             'action' => 'required|string', // Validate the action
@@ -95,11 +133,12 @@ class ScanController extends Controller
 
         return redirect()->route('staff.histories.index')->with('success', 'Data berhasil disimpan');
     }
-    
 
-    public function scann(Request $request) {
+
+    public function scann(Request $request)
+    {
         $qrcode = $request->input('qrcode');
-        
+
         // Validasi QR Code
         if (!$qrcode) {
             return back()->withErrors('QR Code tidak terbaca!');
@@ -111,9 +150,10 @@ class ScanController extends Controller
         return redirect()->route('admin.scan.index')->with('success', 'QR Code berhasil diproses: ' . $qrcode);
     }
 
-    public function scannn(Request $request) {
+    public function scannn(Request $request)
+    {
         $qrcode = $request->input('qrcode');
-        
+
         // Validasi QR Code
         if (!$qrcode) {
             return back()->withErrors('QR Code tidak terbaca!');
@@ -125,9 +165,10 @@ class ScanController extends Controller
         return redirect()->route('scan1.scan.index')->with('success', 'QR Code berhasil diproses: ' . $qrcode);
     }
 
-    public function scannnn(Request $request) {
+    public function scannnn(Request $request)
+    {
         $qrcode = $request->input('qrcode');
-        
+
         // Validasi QR Code
         if (!$qrcode) {
             return back()->withErrors('QR Code tidak terbaca!');
@@ -138,8 +179,9 @@ class ScanController extends Controller
 
         return redirect()->route('scan1.scan.index')->with('success', 'QR Code berhasil diproses: ' . $qrcode);
     }
-    
-    public function scannnnn(Request $request) {
+
+    public function scannnnn(Request $request)
+    {
         $qrcode = $request->input('qrcode');
 
 
@@ -148,8 +190,5 @@ class ScanController extends Controller
         }
 
         return redirect()->route('scan2.scan.index')->with('success', 'QR Code berhasil diproses' . $qrcode);
-
-
     }
-    
 }

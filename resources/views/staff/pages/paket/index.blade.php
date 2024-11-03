@@ -53,27 +53,29 @@
                                 <div class="table-responsive">
                                     <table class="table-striped table">
                                         <tr>
+                                            <th class="text-center">No</th>
                                             <th class="text-center">Nama Paket</th>
                                             <th class="text-center">Wahana</th>
                                             <th class="text-center">Porsi</th>
                                             <th class="text-center">Aksi</th>
                                         </tr>
-                                        @foreach($pakets as $paket)
-                                        <tr>
-                                            <td class="text-center">{{ $loop->iteration }}</td>
-                                            <td class="text-center">{{ $paket->nm_paket }}</td>
-                                            <td class="text-center">{{ $paket->wahana }}</td>
-                                            <td class="text-center">{{ $paket->porsi }}</td>
-                                            <td>
-                                                {{-- <a href="{{ route('pakets.show', $paket->id) }}" class="btn btn-info btn-sm">Detail</a> --}}
-                                                {{-- <a href="{{ route('pakets.edit', $paket->id) }}" class="btn btn-warning btn-sm">Edit</a> --}}
-                                                <form action={{--"{{ route('pakets.destroy', $paket->id) }}"--}} method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus paket ini?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
-                                                </form>
-                                            </td>
-                                        </tr>
+                                        @foreach ($pakets as $paket)
+                                            <tr>
+                                                <td class="text-center">{{ $loop->iteration }}</td>
+                                                <td class="text-center">{{ $paket->nm_paket }}</td>
+                                                <td class="text-center">{{ $paket->wahana }}</td>
+                                                <td class="text-center">{{ $paket->porsi }}</td>
+                                                <td>
+                                                    {{-- <a href="{{ route('pakets.show', $paket->id) }}" class="btn btn-info btn-sm">Detail</a> --}}
+                                                    {{-- <a href="{{ route('pakets.edit', $paket->id) }}" class="btn btn-warning btn-sm">Edit</a> --}}
+                                                    <form action={{-- "{{ route('pakets.destroy', $paket->id) }}" --}} method="POST" class="d-inline"
+                                                        onsubmit="return confirm('Yakin ingin menghapus paket ini?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
                                         @endforeach
 
                                     </table>

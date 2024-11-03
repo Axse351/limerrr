@@ -266,6 +266,7 @@
                 var nm_paket = $('#nm_paket option:selected').text();
                 var wahana = $('#wahana').val();
                 var porsi = $('#porsi').val();
+                var barcodeData = "AXSE-" + Date.now();
 
                 $('#confirm_nm_konsumen').text(nm_konsumen);
                 $('#confirm_nohp').text(nohp);

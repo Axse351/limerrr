@@ -24,4 +24,9 @@ class Histories extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function transaksi()
+    {
+        return $this->belongsTo(Transaksi::class, 'transaksi_id'); // Ensure foreign key matches
+    }
+
 }

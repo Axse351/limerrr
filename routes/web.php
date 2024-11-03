@@ -114,8 +114,14 @@ Route::middleware(['auth'])->group(function () {
         // Scan routes
         Route::get('scan', [ScanController::class, 'index'])->name('staff.scan.index');
         Route::post('/scan', [ScanController::class, 'scan'])->name('staff.scan.process');
+        Route::get('/scan-form', [ScanController::class, 'showScanForm'])->name('staff.scan.form');
         // Route::post('/scan/process', [ScanController::class, 'scan'])->name('scan.process');
         Route::get('/histories', [HistoriesController::class, 'index'])->name('staff.histories.index');
+        Route::post('/histories/store', [HistoriesController::class, 'store'])->name('staff.histories.store');
+        Route::post('/histories/update/{id}', [HistoriesController::class, 'update'])->name('histories.update');
+        Route::post('/histories/update-qty/{id}', [HistoriesController::class, 'updateQty'])->name('histories.updateQty');
+
+
 
         // Transaksi routes
         Route::get('/transaksi', [TransaksiController::class, 'index'])->name('staff.transaksi.index');
@@ -123,6 +129,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/transaksi', [TransaksiController::class, 'store'])->name('staff.transaksi.store');
         Route::delete('transaksi/{transaksi}', [TransaksiController::class, 'destroy'])->name('staff.transaksi.destroy');
         Route::get('/transaksi/{id}', [TransaksiController::class, 'show'])->name('staff.transaksi.show');
+        Route::post('/staff/transaksi/sendMessage', [TransaksiController::class, 'sendWhatsAppMessage'])->name('staff.transaksi.sendWhatsApp');
+        Route::post('/staff/transaksi/sendMessageWithBarcode', [TransaksiController::class, 'sendWhatsAppMessageWithBarcode'])->name('staff.transaksi.sendMessageWithBarcode');
         // Paket routes
         Route::get('/paket', [PaketController::class, 'index'])->name('staff.paket.index');
         Route::get('/paket/create', [PaketController::class, 'create'])->name('staff.paket.create');
