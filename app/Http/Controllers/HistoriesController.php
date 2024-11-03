@@ -42,41 +42,29 @@ class HistoriesController extends Controller
     }
     public function store(Request $request)
     {
-        // Validate the incoming data and handle validation errors
-        // $validatedData = $request->validate([
-        //     'transaksi_id' => 'required',
-        //     'jenis_transaksi' => 'required',
-        //     'qty' => 'required',
-        //     'tanggal' => 'required',
-        //     'jam' => 'required',
-        // ]);
+        $request->validate([
+            'transaksi_id' => 'required',
+            'jenis_transaksi' => 'required',
+            'qty' => 'required',
+            'tanggal' => 'required',
+            'jam' => 'required',
+        ]);
 
-        try {
-            // Attempt to create a new history record
-            $history = Histories::create($request);
+        // Buat data histori baru
+        $history = Histories::create([
+            'transaksi_id' => $request->transaksi_id,
+            'jenis_transaksi' => $request->jenis_transaksi,
+            'qty' => $request->qty,
+            'tanggal' => $request->tanggal,
+            'jam' => $request->jam,
+        ]);
 
-            // Check if history was successfully created
-            if ($history) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Data has been added successfully!',
-                    'history' => $history
-                ], 201);
-            } else {
-                // Handle case where history creation failed
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to add data. Please try again.'
-                ], 500);
-            }
-        } catch (\Exception $e) {
-            dd($e);
-            // // Catch any unexpected errors and provide feedback
-            // return response()->json([
-            //     'success' => false,
-            //     'message' => 'An error occurred while processing your request.',
-            //     'error' => $e->getMessage() // Only include in debugging or remove in production
-            // ], 500);
+        if ($history) {
+            $data = [
+                'status' => 'success',
+                'message' => 'History created successfully',
+            ];
+            return response()->json($data, 200);
         }
     }
 
